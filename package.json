@@ -1,0 +1,25 @@
+{
+    "name": "@cwiiis/url-shortener",
+    "version": "0.0.1",
+    "description": "URL shortener service",
+    "license": "MIT",
+    "author": {
+        "name": "Chris Lord",
+        "email": "contact@chrislord.net",
+        "url": "http://www.chrislord.net/"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Cwiiis/url-shortener.git"
+    },
+    "dependencies": {
+        "express": "4.17.0",
+        "express-handlebars": "3.1.0",
+        "body-parser": "1.19.0",
+        "mongodb": "3.2.5"
+    },
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js"
+    }
+}

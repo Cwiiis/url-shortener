@@ -1,0 +1,26 @@
+html {
+    background-color: white;
+    color: darkslategray;
+    text-align: center;
+    font-family: helvetica;
+}
+
+body {
+    margin: 5em 1em;
+}
+
+h1 {
+    font-size: 4em;
+    letter-spacing: 0.1em;
+    font-variant: all-small-caps;
+}
+
+label, input {
+    vertical-align: bottom;
+}
+
+.error {
+    color: red;
+    font-style: oblique;
+    margin: 1em;
+}
