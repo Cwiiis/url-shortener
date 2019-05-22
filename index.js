@@ -7,6 +7,20 @@ const dburl = 'mongodb://localhost/url-shortener';
 const port = 8080;
 const app = exp();
 
+function dbConnect(response, callback)
+{
+    mongo.connect(dburl, async (err, client) => {
+        if (err) {
+            response.render('home', {
+                'error-message': 'Database error: ' + err
+            });
+            return;
+        }
+
+        callback(client);
+    });
+}
+
 // Shorten a URL and store it under @code. If @code is empty, create a new, random key.
 function shorten(url, code, response)
 {
@@ -20,16 +34,8 @@ function shorten(url, code, response)
         }
     }
 
-    mongo.connect(dburl, async (err, client) => {
-        if (err) {
-            response.render('home', {
-                'error-message': 'Database error: ' + err
-            });
-            return;
-        }
-
+    dbConnect(response, async (client) => {
         var db = client.db();
-
         var count;
         if (code == '') {
             // If no code specified, create a new random code
@@ -73,14 +79,7 @@ function shorten(url, code, response)
 // Redirect to a URL stored under @code
 function retrieve(code, response, redirect)
 {
-    mongo.connect(dburl, (err, client) => {
-        if (err) {
-            response.render('home', {
-                'error-message': 'Database error: ' + err
-            });
-            return;
-        }
-
+    dbConnect(response, (client) => {
         var db = client.db();
         db.collection('URLs').findOne({'code': code}).then((result) => {
             if (!result) {
@@ -106,17 +105,11 @@ function retrieve(code, response, redirect)
     });
 }
 
+// View all records, sorted by most recent first
 function view(response)
 {
     // Paging here would be nice, as it is, limit viewing to 100 records
-    mongo.connect(dburl, (err, client) => {
-        if (err) {
-            response.render('home', {
-                'error-message': 'Database error: ' + err
-            });
-            return;
-        }
-
+    dbConnect(response, (client) => {
         var db = client.db();
         db.collection('URLs').find({}).sort({$natural:-1}).limit(100).toArray().then((result) => {
             var count = result ? result.length : 0;
