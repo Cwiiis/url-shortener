@@ -21,9 +21,11 @@
     },
     "main": "index.js",
     "scripts": {
-        "start": "node index.js"
+        "start": "node index.js",
+        "test": "NODE_ENV=test mocha '/tests/test-*.js'"
     },
     "devDependencies": {
         "eslint": "^5.16.0",
+        "mocha": "^6.1.4"
     }
 }

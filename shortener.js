@@ -3,9 +3,11 @@ const mongo = require('mongodb').MongoClient;
 module.exports = function(dburl) {
     var module = {};
 
+    module.dburl = dburl;
+
     module.dbConnect = function(response, callback)
     {
-        mongo.connect(dburl, async (err, client) => {
+        mongo.connect(this.dburl, async (err, client) => {
             if (err) {
                 response.render('home', {
                     'error-message': 'Database error: ' + err
@@ -15,7 +17,7 @@ module.exports = function(dburl) {
 
             callback(client);
         });
-    }
+    };
 
     // Shorten a URL and store it under @code. If @code is empty, create a new, random key.
     module.shorten = function(url, code, response)
@@ -70,7 +72,7 @@ module.exports = function(dburl) {
                 "short-url": code
             });
         });
-    }
+    };
 
     // Redirect to a URL stored under @code
     module.retrieve = function(code, response, redirect)
@@ -99,7 +101,7 @@ module.exports = function(dburl) {
                 client.close();
             });
         });
-    }
+    };
 
     // View all records, sorted by most recent first
     module.view = function(response)
@@ -116,7 +118,7 @@ module.exports = function(dburl) {
                 client.close();
             });
         });
-    }
+    };
 
     return module;
 };
