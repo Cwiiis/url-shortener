@@ -12,7 +12,7 @@ function shorten(url, code, response)
 {
     // Validate code
     if (code != '') {
-        if (code.length < 4 || code.length > 16) {
+        if (code.length < 4 || code.length > 16 || code == 'shorten' || code == 'view') {
             response.render('home', {
                 'error-message': 'Invalid URL code'
             });
@@ -29,10 +29,10 @@ function shorten(url, code, response)
         }
 
         var db = client.db();
-        
+
+        var count;
         if (code == '') {
             // If no code specified, create a new random code
-            var count = 0;
             do {
                 // Note, this is only pseudo-random, but should be fine for this
                 // purpose. It won't generate upper-case letters either, but I like it
@@ -45,7 +45,7 @@ function shorten(url, code, response)
             } while(count > 0);
         } else {
             // Check to see that this code doesn't already exist
-            var count = await db.collection('URLs').countDocuments({'code': code});
+            count = await db.collection('URLs').countDocuments({'code': code});
             if (count > 0) {
                 client.close();
                 response.render('home', {
@@ -56,7 +56,7 @@ function shorten(url, code, response)
         }
 
         // Insert new shortened URL record
-        var cursor = db.collection('URLs').insertOne({
+        db.collection('URLs').insertOne({
             'code': code,
             'url': url
         });
@@ -71,7 +71,7 @@ function shorten(url, code, response)
 }
 
 // Redirect to a URL stored under @code
-function retrieve(code, response)
+function retrieve(code, response, redirect)
 {
     mongo.connect(dburl, (err, client) => {
         if (err) {
@@ -82,17 +82,48 @@ function retrieve(code, response)
         }
 
         var db = client.db();
-        var result = db.collection('URLs').findOne({'code': code}).then((result) => {
+        db.collection('URLs').findOne({'code': code}).then((result) => {
             if (!result) {
                 console.log(`Record '${code}' not found`);
                 response.render('home', {
                     'error-message': 'Code not found'
                 });
             } else {
-                // Redirect to shortened URL
                 console.log('Found record', result);
-                response.redirect(301, result.url);
+                if (redirect) {
+                    // Redirect to shortened URL
+                    response.redirect(301, result.url);
+                } else {
+                    // Display shortened URL
+                    response.render('result', {
+                        "url": result.url,
+                        "short-url": code
+                    });            
+                }
             }
+            client.close();
+        });
+    });
+}
+
+function view(response)
+{
+    // Paging here would be nice, as it is, limit viewing to 100 records
+    mongo.connect(dburl, (err, client) => {
+        if (err) {
+            response.render('home', {
+                'error-message': 'Database error: ' + err
+            });
+            return;
+        }
+
+        var db = client.db();
+        db.collection('URLs').find({}).sort({$natural:-1}).limit(100).toArray().then((result) => {
+            var count = result ? result.length : 0;
+            response.render('view', {
+                "count": count,
+                "records": result
+            });
             client.close();
         });
     });
@@ -120,22 +151,32 @@ app.get('/', (request, response) => {
     response.render('home');
 });
 
+app.get('/view', (request, response) => {
+    console.log('Retrieving view page');
+    view(response);
+});
+
 // Respond to shorten POST
 app.post('/shorten', (request, response) => {
-    console.log(`Shortening ${request.body.url} to ${request.body.code}`);
-    shorten(request.body.url, request.body.code, response);
+    console.log(`Shortening '${request.body.url}' to '${request.body.code}'`);
+    if (request.body.url == '') {
+        retrieve(request.body.code, response, false);
+    } else {
+        shorten(request.body.url, request.body.code, response);
+    }
 });
 
 // Respond to random requests
 app.get('/*', (request, response) => {
     console.log(`Retrieving URL '${request.originalUrl}'`);
-    retrieve(request.originalUrl.substr(1), response);
+    retrieve(request.originalUrl.substr(1), response, true);
 })
 
 // Exception reporting
 app.use((err, request, response, next) => {
     console.error('An error occurred:', err);
     response.status(500).send('An error occurred: ' + err);
+    next();
 })
 
 // Start

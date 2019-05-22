@@ -1,1 +1,7 @@
-<a href="{{short-url}}" title="{{url}}">{{short-url}}</a>
+<a href="{{short-url}}" title="{{url}}">{{url}} -> <span id="short-url">{{short-url}}</span></a>
+<script type="text/javascript">
+<!--
+    var shortUrl = document.getElementById('short-url');
+    shortUrl.textContent = window.location.origin + '/' + shortUrl.textContent;
+//-->
+</script>

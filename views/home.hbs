@@ -1,7 +1,7 @@
 <div class="error">{{error-message}}</div>
 <form action="/shorten" method="post">
-    <label>Enter URL</label> 
-    <input type="url" name="url" placeholder="URL" /> 
+    <input type="url" name="url" size="32" placeholder="URL (leave blank to perform look-up)" /> 
     <input type="text" name="code" minlength="4" maxlength="16" size="16" placeholder="Optional: Code" /> 
     <button type="submit">Go!</button>
 </form>
+<a class="footer" href="/view">View all</a>

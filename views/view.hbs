@@ -1,0 +1,19 @@
+<p>{{count}} URL(s) in database</p>
+<table align="center">
+    <tr><td>Long URL</td><td>Short URL</td></tr>
+    {{#each records}}
+    <tr><td><a href="{{url}}">{{url}}</a></td><td><a href="/{{code}}">{{code}}</a></td></tr>
+    {{/each}}
+</table>
+<script type="text/javascript">
+<!--
+    var rows = document.getElementsByTagName('tr');
+    for (var row of rows) {
+        var links = row.getElementsByTagName('a');
+        if (links.length == 2) {
+            var shortUrl = links[1];
+            shortUrl.textContent = window.location.origin + '/' + shortUrl.textContent;
+        }
+    }
+//-->
+</script>
