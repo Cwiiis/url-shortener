@@ -5,6 +5,8 @@ module.exports = function(dburl) {
 
     module.dburl = dburl;
 
+    // Connects to the database and calls callback with the client, or renders an error page
+    // if connection fails.
     module.dbConnect = function(response, callback)
     {
         mongo.connect(this.dburl, async (err, client) => {
@@ -19,7 +21,7 @@ module.exports = function(dburl) {
         });
     };
 
-    // Shorten a URL and store it under @code. If @code is empty, create a new, random key.
+    // Shorten a URL and store it under @code. If @code is '', create a new, random key.
     module.shorten = function(url, code, response)
     {
         // Validate code

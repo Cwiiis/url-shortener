@@ -33,6 +33,7 @@ app.get('/', (request, response) => {
     response.render('home');
 });
 
+// Enable the view links page
 app.get('/view', (request, response) => {
     console.log('Retrieving view page');
     shortener.view(response);
@@ -48,7 +49,7 @@ app.post('/shorten', (request, response) => {
     }
 });
 
-// Respond to random requests
+// Respond to random requests (i.e. redirect requests)
 app.get('/*', (request, response) => {
     console.log(`Retrieving URL '${request.originalUrl}'`);
     shortener.retrieve(request.originalUrl.substr(1), response, true);
